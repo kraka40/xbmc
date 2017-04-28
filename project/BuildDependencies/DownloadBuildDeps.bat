@@ -5,7 +5,7 @@ SETLOCAL
 SET TARGETPLATFORM=%1
 SET NATIVEPLATFORM=%2
 
-IF "%TARGETPLATFORM%" == "" SET TARGETPLATFORM=win32
+IF "%TARGETPLATFORM%" == "" SET TARGETPLATFORM=x64
 IF "%NATIVEPLATFORM%" == "" SET NATIVEPLATFORM=win32
 
 ECHO TARGETPLATFORM: %TARGETPLATFORM%
@@ -26,6 +26,7 @@ PUSHD %BUILD_DEPS_PATH%
 REM Can't run rmdir and md back to back. access denied error otherwise.
 IF EXIST lib rmdir lib /S /Q
 IF EXIST include rmdir include /S /Q
+IF EXIST x64 rmdir x64 /S /Q
 IF EXIST %TMP_PATH% rmdir %TMP_PATH% /S /Q
 
 SET DL_PATH="%BUILD_DEPS_PATH%\downloads"
@@ -34,8 +35,7 @@ SET ZIP=%BUILD_DEPS_PATH%\..\Win32BuildSetup\tools\7z\7za
 
 IF NOT EXIST %DL_PATH% md %DL_PATH%
 
-md lib
-md include
+md x64
 md %TMP_PATH%
 
 cd scripts
@@ -57,6 +57,10 @@ IF NOT EXIST %FORMED_OK_FLAG% (
 )
 
 rmdir %TMP_PATH% /S /Q
+
+cd ..
+
+XCOPY /s /y x64\bin\* %APP_PATH%\system
 
 REM Restore the previous current directory
 POPD
