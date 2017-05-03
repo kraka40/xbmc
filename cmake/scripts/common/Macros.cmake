@@ -267,6 +267,7 @@ function(copy_files_from_filelist_to_buildtree pattern)
       string(STRIP ${filename} filename)
       core_file_read_filtered(fstrings ${filename})
       foreach(dir ${fstrings})
+        string(CONFIGURE ${dir} dir)
         string(REPLACE " " ";" dir ${dir})
         list(GET dir 0 src)
         list(LENGTH dir len)
@@ -583,7 +584,7 @@ function(core_find_git_rev stamp)
   endif()
 endfunction()
 
-# Parses version.txt and libKODI_guilib.h and sets variables
+# Parses version.txt and versions.h and sets variables
 # used to construct dirs structure, file naming, API version, etc.
 #
 # The following variables are set from version.txt:
@@ -600,7 +601,7 @@ endfunction()
 #   APP_ADDON_API - the addon API version in the form of 16.9.702
 #   FILE_VERSION - file version in the form of 16,9,702,0 - Windows only
 #
-# The following variables are set from libKODI_guilib.h:
+# The following variables are set from versions.h:
 #   guilib_version - current ADDONGUI API version
 #   guilib_version_min - minimal ADDONGUI API version
 macro(core_find_versions)
@@ -629,9 +630,9 @@ macro(core_find_versions)
     string(TOLOWER ${APP_VERSION_TAG} APP_VERSION_TAG_LC)
   endif()
   string(REPLACE "." "," FILE_VERSION ${APP_ADDON_API}.0)
-  file(STRINGS ${CORE_SOURCE_DIR}/xbmc/addons/kodi-addon-dev-kit/include/kodi/libKODI_guilib.h guilib_version REGEX "^.*GUILIB_API_VERSION (.*)$")
+  file(STRINGS ${CORE_SOURCE_DIR}/xbmc/addons/kodi-addon-dev-kit/include/kodi/versions.h guilib_version REGEX "^.*ADDON_GLOBAL_VERSION_GUI (.*)$")
   string(REGEX REPLACE ".*\"(.*)\"" "\\1" guilib_version ${guilib_version})
-  file(STRINGS ${CORE_SOURCE_DIR}/xbmc/addons/kodi-addon-dev-kit/include/kodi/libKODI_guilib.h guilib_version_min REGEX "^.*GUILIB_MIN_API_VERSION (.*)$")
+  file(STRINGS ${CORE_SOURCE_DIR}/xbmc/addons/kodi-addon-dev-kit/include/kodi/versions.h guilib_version_min REGEX "^.*ADDON_GLOBAL_VERSION_GUI_MIN (.*)$")
   string(REGEX REPLACE ".*\"(.*)\"" "\\1" guilib_version_min ${guilib_version_min})
   # unset variables not used anywhere else
   unset(version_list)
@@ -642,9 +643,9 @@ macro(core_find_versions)
     message(FATAL_ERROR "Could not determine app version! Make sure that ${CORE_SOURCE_DIR}/version.txt exists")
   endif()
 
-  # bail if we can't parse libKODI_guilib.h
+  # bail if we can't parse versions.h
   if(NOT DEFINED guilib_version OR NOT DEFINED guilib_version_min)
-    message(FATAL_ERROR "Could not determine add-on API version! Make sure that ${CORE_SOURCE_DIR}/xbmc/addons/kodi-addon-dev-kit/include/kodi/libKODI_guilib.h exists")
+    message(FATAL_ERROR "Could not determine add-on API version! Make sure that ${CORE_SOURCE_DIR}/xbmc/addons/kodi-addon-dev-kit/include/kodi/versions.h exists")
   endif()
 endmacro()
 
